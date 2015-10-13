@@ -53,7 +53,7 @@ function assignO365Licenses()
     Connect-MSOLService –Credential $Cred
     Get-MsolAccountSku
     $o365ID = Read-Host "Please Enter in the samAccountName of the user you wish to assign licenses to (eg supachots, yoshin, tomoyukis)"
-    $o365ID = $o365ID -replace "\.","_" #Office 365 replaces dots with underscores
+    $o365ID = $o365ID -replace "\.","_" #Office 365 replaces dots with underscore
 
     $o365user = $o365ID+"@reallyenglish.com"
     $msolAcc = Get-MsolUser -UserPrincipalName $o365user -ErrorAction SilentlyContinue

@@ -1,4 +1,4 @@
-#Disables specified users' AD and Office365 accounts
+#Disables specified users' AD and Office365 accounts.
 
 add-PSSnapin  quest.activeroles.admanagement -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
 
