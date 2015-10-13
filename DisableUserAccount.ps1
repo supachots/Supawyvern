@@ -59,12 +59,21 @@ function unassignO365Licenses()
     $Cred = Get-Credential
     Connect-MSOLService –Credential $Cred
     Get-MsolAccountSku
-    $o365user = Read-Host "Please Enter in the samAccountName of the user you wish to disable (eg supachots, yoshin, tomoyukis)"
-    $o365user = $o365user+"@rejapan.onmicrosoft.com"
-    $msolAcc = Get-MsolUser -UserPrincipalName $o365user
+    $o365ID = Read-Host "Please Enter in the samAccountName of the user you wish to disable (eg supachots, yoshin, tomoyukis)"
+    $o365ID = $o365ID -replace "\.","_" #Office 365 replaces dots with underscores
+    $o365user = $o365ID+"@reallyenglish.com"
+    $msolAcc = Get-MsolUser -UserPrincipalName $o365user -ErrorAction SilentlyContinue
+    if(!$msolAcc -And (Get-MsolUser -UserPrincipalName ($o365ID+"@rejapan.onmicrosoft.com")))
+    {
+            Write-Host ("Please log into Office 365 and change " +$o365ID+"@rejapan.onmicrosoft.com"+" to " + $o365user) -ForegroundColor "Red"
+            Write-Host ""
+            $o365user = $o365ID+"@rejapan.onmicrosoft.com"
+            $msolAcc = Get-MsolUser -UserPrincipalName $o365user
+    }
+
     while(!$msolAcc)
     {
-        $o365user = Read-Host "User not found. Please Enter in the samAccountName of the user you wish to disable (eg supachots, yoshin, tomoyukis)"
+        $o365user = Read-Host "User not found. Please Enter in the samAccountName of the user you wish to unassign licenses (eg supachots, yoshin, tomoyukis)"
         $msolAcc = Get-MsolUser -UserPrincipalName $o365user
     }
     Get-MsolUser -UserPrincipalName $o365user | Set-MsolUserLicense -RemoveLicenses "rejapan:O365_BUSINESS" -ErrorAction SilentlyContinue
@@ -139,5 +148,20 @@ function disableADAcc()
     else{ exit }
 }
 
-disableADAcc
-unassignO365Licenses
+
+Write-Host "**********************************************************"
+Write-Host "* Disable Windows AD Accounts and"
+Write-Host "* Unassign Office 365 Licenses"
+Write-Host "**********************************************************"
+Write-Host ""
+
+$tasks = Read-Host "Enter '1' to disable AD Account, '2' to unassign Office 365 licenses, or '3' to perform both tasks"
+If ($tasks.ToLower() -eq "1")
+{ disableADAcc }
+elseif ($tasks.ToLower() -eq "2")
+{ unassignO365Licenses }
+else
+{
+    disableADAcc
+    unassignO365Licenses
+}
